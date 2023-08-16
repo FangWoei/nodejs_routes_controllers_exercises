@@ -28,6 +28,78 @@ let authors = [
   { id: 2, name: "Author Two", bio: "Bio of Author Two" },
 ];
 
+
+// get authors and books
+app.get("/authorsbooks", (req, res) => {
+  const booksWithAuthors = books.map(book => {
+    const author = authors.find(author => author.id === book.authorId);
+    return {
+      ...book,
+      author: {
+        name: author.name,
+        bio: author.bio
+      }
+    };
+  });
+  
+  res.json(booksWithAuthors);
+});
+
+// get a authors and books
+app.get("/authorsbooks/:id", (req, res) => {
+  const bookId = parseInt(req.params.id);
+  const book = books.find(book => book.id === bookId);
+  
+  if (book) {
+    const author = authors.find(author => author.id === book.authorId);
+    const bookWithAuthor = {
+      ...book,
+      name: author.name,
+      bio: author.bio
+    };
+
+    res.status(200).json(bookWithAuthor);
+  } else {
+    res.status(400).json({ error: "Book with the provided ID is not available" });
+  }
+});
+
+
+
+// get review and books
+app.get("/reviewsbooks", (req, res) => {
+  const booksWithReview = reviews.map(review => {
+    const book = books.find(book => book.id === review.bookId);
+    return {
+      ...review,
+      book: {
+        title: book.title,
+        description: book.description
+      }
+    };
+  });
+  
+  res.json(booksWithReview);
+});
+
+// get a review and books
+app.get("/reviewsbooks/:id", (req, res) => {
+  const reviewId = parseInt(req.params.id);
+  const review = reviews.find(review => review.id === reviewId);
+
+  if (review) {
+    const book = books.find(book => book.id === review.bookId);
+    const bookWithReview = {
+      ...review,
+        title: book.title,
+    };
+    res.status(200).json(bookWithReview);
+  } else {
+    res.status(400).json({ error: "Book with the provided ID is not available" });
+  }
+});
+
+
 // get all books
 app.get("/books", (req, res) => {
   res.json(books);
@@ -87,7 +159,7 @@ app.get("/authors/:id", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send('<a href="/books">Books </a><a href="/reviews">Reviews </a><a href="/authors">Authors </a>');
+  res.send('<div><a href="/books">Books</a></div><div><a href="/reviews">Reviews</a></div><div><a href="/authors">Authors</a></div><div><a href="/authorsbooks">Authors and Books</a></div><div><a href="/reviewsbooks">Reviews and Books</a></div>');
 });
 
 // start the server
